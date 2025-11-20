@@ -27,7 +27,6 @@ import uk.co.real_logic.sbe.ir.*;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -129,7 +128,8 @@ public class NodeJsGenerator implements CodeGenerator
                 sb.append("import { MessageHeader } from './MessageHeader.js';\n");
                 for (final String importName : compositeImports)
                 {
-                    sb.append("import { ").append(importName).append(" } from './").append(importName).append(".js';\n");
+                    sb.append("import { ").append(importName).append(" } from './"
+).append(importName).append(".js';\n");
                 }
                 sb.append("\n");
 
@@ -168,7 +168,7 @@ public class NodeJsGenerator implements CodeGenerator
 
         // Collect imports from groups (including nested groups)
         final List<Token> fields = new ArrayList<>();
-        int i = collectFields(messageBody, 0, fields);
+        final int i = collectFields(messageBody, 0, fields);
         final List<Token> groups = new ArrayList<>();
         collectGroups(messageBody, i, groups);
         collectImportsFromGroups(groups, imports);
@@ -212,7 +212,7 @@ public class NodeJsGenerator implements CodeGenerator
 
                 // Recursively collect from nested groups
                 final List<Token> nestedGroups = new ArrayList<>();
-                int j = 0;
+                final int j = 0;
                 for (int k = 0; k < groupBody.size(); )
                 {
                     final Token token = groupBody.get(k);
@@ -532,7 +532,8 @@ public class NodeJsGenerator implements CodeGenerator
                     // scalar
                     final String writeMethod = bufferWriteMethod(primitiveType, byteOrderStr, useUnsafeMode);
                     sb.append(INDENT).append(INDENT).append("buffer.").append(writeMethod)
-                        .append("(this._").append(propName).append(", offset + ").append(compositeOffset).append(");\n");
+                        .append("(this._").append(propName).append(", offset + ")
+                        .append(compositeOffset).append(");\n");
                     compositeOffset += primitiveTypeSize(primitiveType);
                 }
             }
@@ -828,7 +829,7 @@ public class NodeJsGenerator implements CodeGenerator
                     }
                     else
                     {
-                    sb.append("0");
+                        sb.append("0");
                     }
                     sb.append(";\n");
                 }
@@ -953,7 +954,8 @@ public class NodeJsGenerator implements CodeGenerator
                     if (primitiveType == PrimitiveType.CHAR)
                     {
                         // char array: encode as fixed-length string
-                        sb.append(INDENT).append(INDENT).append("// Encode char array: ").append(fieldName).append("\n");
+                        sb.append(INDENT).append(INDENT).append("// Encode char array: ")
+                            .append(fieldName).append("\n");
                         sb.append(INDENT).append(INDENT).append("for (let i = 0; i < ").append(arrayLength)
                             .append("; i++) {\n");
                         sb.append(INDENT).append(INDENT).append(INDENT)
@@ -1164,11 +1166,13 @@ public class NodeJsGenerator implements CodeGenerator
                     if (primitiveType == PrimitiveType.CHAR)
                     {
                         // char array: decode as fixed-length string
-                        sb.append(INDENT).append(INDENT).append("// Decode char array: ").append(fieldName).append("\n");
+                        sb.append(INDENT).append(INDENT).append("// Decode char array: ")
+                            .append(fieldName).append("\n");
                         sb.append(INDENT).append(INDENT).append("let ").append(fieldName).append("Chars = '';\n");
                         sb.append(INDENT).append(INDENT).append("for (let i = 0; i < ").append(arrayLength)
                             .append("; i++) {\n");
-                        sb.append(INDENT).append(INDENT).append(INDENT).append("const charCode = buffer.readUInt8(pos + i);\n");
+                        sb.append(INDENT).append(INDENT).append(INDENT)
+                            .append("const charCode = buffer.readUInt8(pos + i);\n");
                         sb.append(INDENT).append(INDENT).append(INDENT).append("if (charCode === 0) break;\n");
                         sb.append(INDENT).append(INDENT).append(INDENT).append(fieldName)
                             .append("Chars += String.fromCharCode(charCode);\n");
@@ -1566,7 +1570,8 @@ public class NodeJsGenerator implements CodeGenerator
                         final String varDataName = formatPropertyName(varDataToken.name());
 
                         // Check if varData has characterEncoding (string) or not (Buffer)
-                        final List<Token> varDataTokens = groupVarData.subList(k, k + varDataToken.componentTokenCount());
+                        final List<Token> varDataTokens =
+                            groupVarData.subList(k, k + varDataToken.componentTokenCount());
                         boolean hasEncoding = false;
                         for (final Token token : varDataTokens)
                         {
@@ -1922,7 +1927,7 @@ public class NodeJsGenerator implements CodeGenerator
     /**
      * Helper class to hold dimension type information.
      */
-    private static class DimensionTypes
+    private static final class DimensionTypes
     {
         Token blockLengthToken;
         Token numInGroupToken;
@@ -1931,7 +1936,7 @@ public class NodeJsGenerator implements CodeGenerator
     /**
      * Helper class to hold varData type information.
      */
-    private static class VarDataTypes
+    private static final class VarDataTypes
     {
         Token lengthToken;
         Token dataToken;
@@ -1939,6 +1944,8 @@ public class NodeJsGenerator implements CodeGenerator
 
     /**
      * Extract blockLength and numInGroup types from dimension composite.
+     * @param dimensionTokens the list of tokens representing the dimension composite
+     * @return DimensionTypes containing blockLength and numInGroup tokens
      * @throws IllegalStateException if required fields are missing
      */
     private DimensionTypes extractDimensionTypes(final List<Token> dimensionTokens)
@@ -1978,6 +1985,8 @@ public class NodeJsGenerator implements CodeGenerator
 
     /**
      * Extract length and data types from varData composite.
+     * @param varDataTokens the list of tokens representing the varData composite
+     * @return VarDataTypes containing length and data tokens
      * @throws IllegalStateException if required fields are missing
      */
     private VarDataTypes extractVarDataTypes(final List<Token> varDataTokens)
@@ -2017,6 +2026,9 @@ public class NodeJsGenerator implements CodeGenerator
 
     /**
      * Format a constant value for JavaScript output.
+     * @param constValue the primitive value to format
+     * @param primitiveType the type of the primitive value
+     * @return formatted string representation for JavaScript
      */
     private String formatConstantValue(final PrimitiveValue constValue, final PrimitiveType primitiveType)
     {
@@ -2041,6 +2053,8 @@ public class NodeJsGenerator implements CodeGenerator
 
     /**
      * Get JavaScript type name for primitives (for JSDoc).
+     * @param primitiveType the primitive type to convert
+     * @return JavaScript type name string
      */
     private String jsTypeName(final PrimitiveType primitiveType)
     {

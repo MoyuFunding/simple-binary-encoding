@@ -167,7 +167,7 @@ public class NodeJsUtil
             BUFFER_READ_METHOD_MAP_UNSAFE :
             BUFFER_READ_METHOD_MAP;
 
-        String method = methodMap.get(primitiveType);
+        final String method = methodMap.get(primitiveType);
         if (method == null)
         {
             throw new IllegalArgumentException("No Buffer read method for primitive type: " + primitiveType);
@@ -223,7 +223,7 @@ public class NodeJsUtil
             BUFFER_WRITE_METHOD_MAP_UNSAFE :
             BUFFER_WRITE_METHOD_MAP;
 
-        String method = methodMap.get(primitiveType);
+        final String method = methodMap.get(primitiveType);
         if (method == null)
         {
             throw new IllegalArgumentException("No Buffer write method for primitive type: " + primitiveType);
