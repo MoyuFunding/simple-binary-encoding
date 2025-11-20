@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(./gradlew :sbe-tool:compileJava:*)",
+      "Bash(./gradlew generateNodeJsTestCodecs:*)",
+      "Bash(find:*)",
+      "Bash(java:*)",
+      "Bash(./gradlew :sbe-all:build:*)",
+      "Bash(node -e:*)",
+      "Bash(node test-example.js:*)",
+      "Bash(npm test)",
+      "Bash(awk '{print $9, \"\"\"\"(\"\"\"\" $5 \"\"\"\")\"\"\"\"}')",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

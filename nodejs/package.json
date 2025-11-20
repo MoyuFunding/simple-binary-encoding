@@ -1,0 +1,20 @@
+{
+  "name": "sbe-nodejs-generated",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Generated SBE codecs for Node.js",
+  "scripts": {
+    "test": "node test-example.js"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "sbe",
+    "simple-binary-encoding",
+    "codec",
+    "binary",
+    "serialization"
+  ],
+  "license": "Apache-2.0"
+}

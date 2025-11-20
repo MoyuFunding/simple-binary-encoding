@@ -517,4 +517,42 @@ public class ValidationUtil
                 return false;
         }
     }
+
+    /**
+     * JavaScript/TypeScript reserved keywords.
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#keywords">
+     *     JavaScript keywords</a>
+     */
+    private static final Set<String> JAVASCRIPT_KEYWORDS = Set.of(
+        // Reserved keywords
+        "break", "case", "catch", "class", "const",
+        "continue", "debugger", "default", "delete", "do",
+        "else", "export", "extends", "finally", "for",
+        "function", "if", "import", "in", "instanceof",
+        "new", "return", "super", "switch", "this",
+        "throw", "try", "typeof", "var", "void",
+        "while", "with", "yield",
+        // Future reserved keywords
+        "enum", "implements", "interface", "let", "package",
+        "private", "protected", "public", "static", "await",
+        // Literals
+        "null", "true", "false",
+        // TypeScript specific
+        "abstract", "as", "asserts", "any", "async",
+        "boolean", "constructor", "declare", "get", "infer",
+        "is", "keyof", "module", "namespace", "never",
+        "readonly", "require", "number", "object", "set",
+        "string", "symbol", "type", "undefined", "unique",
+        "unknown", "from", "of");
+
+    /**
+     * Is the token a JavaScript/TypeScript language keyword?
+     *
+     * @param token to be checked.
+     * @return true if the token is a JavaScript/TypeScript language keyword.
+     */
+    public static boolean isJavaScriptKeyword(final String token)
+    {
+        return JAVASCRIPT_KEYWORDS.contains(token);
+    }
 }
