@@ -4,7 +4,8 @@
   "type": "module",
   "description": "Generated SBE codecs for Node.js",
   "scripts": {
-    "test": "node test-example.js"
+    "test": "node test-example.js",
+    "benchmark": "node bigint-benchmark.js"
   },
   "engines": {
     "node": ">=14.0.0"

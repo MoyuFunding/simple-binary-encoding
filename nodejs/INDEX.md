@@ -26,33 +26,45 @@ Welcome to the SBE Node.js code generator documentation! This directory contains
    - Integration guide (ES modules, CommonJS)
    - Performance notes
 
+4. **[PERFORMANCE.md](./PERFORMANCE.md)** - Performance Guide
+   - BigInt performance considerations (2-5x slower than Number)
+   - When to use int64 vs int32
+   - Schema design best practices
+   - Benchmark results and analysis
+   - Run with: `npm run benchmark`
+
 ### For Developers
 
-4. **[IMPLEMENTATION_STATUS.md](./IMPLEMENTATION_STATUS.md)** - Implementation Status
+5. **[IMPLEMENTATION_STATUS.md](./IMPLEMENTATION_STATUS.md)** - Implementation Status
    - List of completed features
    - Bug fixes (64-bit BigInt, VarData optimization)
    - Verification and test results
    - Code quality improvements
 
-5. **[IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md)** - Developer Implementation Guide
+6. **[IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md)** - Developer Implementation Guide
    - Generator architecture
    - Code generation patterns
    - How to modify the generator
 
-6. **[STATUS.md](./STATUS.md)** - Historical Status Document
+7. **[STATUS.md](./STATUS.md)** - Historical Status Document
    - Original implementation tracking
    - Feature completion status
 
 ### Code Examples
 
-7. **[test-example.js](./test-example.js)** - Comprehensive Test Example
+8. **[test-example.js](./test-example.js)** - Comprehensive Test Example
    - Demonstrates all features
    - Tests encode/decode cycle
    - Run with: `npm test`
 
+9. **[bigint-benchmark.js](./bigint-benchmark.js)** - BigInt Performance Benchmark
+   - Tests BigInt vs Number performance
+   - Real-world SBE encoding scenarios
+   - Run with: `npm run benchmark`
+
 ### Configuration
 
-8. **[package.json](./package.json)** - NPM Package Configuration
+10. **[package.json](./package.json)** - NPM Package Configuration
    - ES module setup (`"type": "module"`)
    - Node.js version requirement (>= 14.0.0)
    - Test script
@@ -65,6 +77,8 @@ Welcome to the SBE Node.js code generator documentation! This directory contains
 - **Learn how to compile and generate code** → [使用指南.md](./使用指南.md#安装与代码生成)
 - **See working code examples** → [test-example.js](./test-example.js)
 - **Understand type mappings** → [README.md](./README.md#type-mappings)
+- **Understand BigInt performance** → [PERFORMANCE.md](./PERFORMANCE.md)
+- **Run performance benchmarks** → `npm run benchmark`
 - **Optimize performance** → [使用指南.md](./使用指南.md#性能优化)
 - **Debug generation issues** → [使用指南.md](./使用指南.md#常见生成问题)
 - **Contribute to the generator** → [IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md)
