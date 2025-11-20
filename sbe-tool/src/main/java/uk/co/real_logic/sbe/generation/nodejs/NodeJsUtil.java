@@ -31,12 +31,15 @@ import static uk.co.real_logic.sbe.generation.Generators.toUpperFirstChar;
 public class NodeJsUtil
 {
     private static final Map<PrimitiveType, String> PRIMITIVE_TYPE_MAP = new EnumMap<>(PrimitiveType.class);
+    private static final Map<PrimitiveType, String> PRIMITIVE_TYPE_MAP_UNSAFE = new EnumMap<>(PrimitiveType.class);
     private static final Map<PrimitiveType, String> BUFFER_READ_METHOD_MAP = new EnumMap<>(PrimitiveType.class);
+    private static final Map<PrimitiveType, String> BUFFER_READ_METHOD_MAP_UNSAFE = new EnumMap<>(PrimitiveType.class);
     private static final Map<PrimitiveType, String> BUFFER_WRITE_METHOD_MAP = new EnumMap<>(PrimitiveType.class);
+    private static final Map<PrimitiveType, String> BUFFER_WRITE_METHOD_MAP_UNSAFE = new EnumMap<>(PrimitiveType.class);
 
     static
     {
-        // JavaScript uses Number for most numeric types
+        // JavaScript uses Number for most numeric types (safe mode with BigInt for 64-bit)
         PRIMITIVE_TYPE_MAP.put(PrimitiveType.CHAR, "number");
         PRIMITIVE_TYPE_MAP.put(PrimitiveType.INT8, "number");
         PRIMITIVE_TYPE_MAP.put(PrimitiveType.INT16, "number");
@@ -48,11 +51,24 @@ public class NodeJsUtil
         PRIMITIVE_TYPE_MAP.put(PrimitiveType.UINT64, "bigint");
         PRIMITIVE_TYPE_MAP.put(PrimitiveType.FLOAT, "number");
         PRIMITIVE_TYPE_MAP.put(PrimitiveType.DOUBLE, "number");
+
+        // Unsafe mode: use Number for everything (faster but loses precision > 2^53)
+        PRIMITIVE_TYPE_MAP_UNSAFE.put(PrimitiveType.CHAR, "number");
+        PRIMITIVE_TYPE_MAP_UNSAFE.put(PrimitiveType.INT8, "number");
+        PRIMITIVE_TYPE_MAP_UNSAFE.put(PrimitiveType.INT16, "number");
+        PRIMITIVE_TYPE_MAP_UNSAFE.put(PrimitiveType.INT32, "number");
+        PRIMITIVE_TYPE_MAP_UNSAFE.put(PrimitiveType.INT64, "number");
+        PRIMITIVE_TYPE_MAP_UNSAFE.put(PrimitiveType.UINT8, "number");
+        PRIMITIVE_TYPE_MAP_UNSAFE.put(PrimitiveType.UINT16, "number");
+        PRIMITIVE_TYPE_MAP_UNSAFE.put(PrimitiveType.UINT32, "number");
+        PRIMITIVE_TYPE_MAP_UNSAFE.put(PrimitiveType.UINT64, "number");
+        PRIMITIVE_TYPE_MAP_UNSAFE.put(PrimitiveType.FLOAT, "number");
+        PRIMITIVE_TYPE_MAP_UNSAFE.put(PrimitiveType.DOUBLE, "number");
     }
 
     static
     {
-        // Node.js Buffer read methods
+        // Node.js Buffer read methods (safe mode with BigInt)
         BUFFER_READ_METHOD_MAP.put(PrimitiveType.CHAR, "readUInt8");
         BUFFER_READ_METHOD_MAP.put(PrimitiveType.INT8, "readInt8");
         BUFFER_READ_METHOD_MAP.put(PrimitiveType.INT16, "readInt16LE");
@@ -64,11 +80,24 @@ public class NodeJsUtil
         BUFFER_READ_METHOD_MAP.put(PrimitiveType.UINT64, "readBigUInt64LE");
         BUFFER_READ_METHOD_MAP.put(PrimitiveType.FLOAT, "readFloatLE");
         BUFFER_READ_METHOD_MAP.put(PrimitiveType.DOUBLE, "readDoubleLE");
+
+        // Unsafe mode: use Number methods (loses precision for > 2^53 but faster)
+        BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.CHAR, "readUInt8");
+        BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.INT8, "readInt8");
+        BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.INT16, "readInt16LE");
+        BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.INT32, "readInt32LE");
+        BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.INT64, "readDoubleLE");
+        BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT8, "readUInt8");
+        BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT16, "readUInt16LE");
+        BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT32, "readUInt32LE");
+        BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT64, "readDoubleLE");
+        BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.FLOAT, "readFloatLE");
+        BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.DOUBLE, "readDoubleLE");
     }
 
     static
     {
-        // Node.js Buffer write methods
+        // Node.js Buffer write methods (safe mode with BigInt)
         BUFFER_WRITE_METHOD_MAP.put(PrimitiveType.CHAR, "writeUInt8");
         BUFFER_WRITE_METHOD_MAP.put(PrimitiveType.INT8, "writeInt8");
         BUFFER_WRITE_METHOD_MAP.put(PrimitiveType.INT16, "writeInt16LE");
@@ -80,17 +109,45 @@ public class NodeJsUtil
         BUFFER_WRITE_METHOD_MAP.put(PrimitiveType.UINT64, "writeBigUInt64LE");
         BUFFER_WRITE_METHOD_MAP.put(PrimitiveType.FLOAT, "writeFloatLE");
         BUFFER_WRITE_METHOD_MAP.put(PrimitiveType.DOUBLE, "writeDoubleLE");
+
+        // Unsafe mode: use Number methods (loses precision for > 2^53 but faster)
+        BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.CHAR, "writeUInt8");
+        BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.INT8, "writeInt8");
+        BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.INT16, "writeInt16LE");
+        BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.INT32, "writeInt32LE");
+        BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.INT64, "writeDoubleLE");
+        BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT8, "writeUInt8");
+        BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT16, "writeUInt16LE");
+        BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT32, "writeUInt32LE");
+        BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT64, "writeDoubleLE");
+        BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.FLOAT, "writeFloatLE");
+        BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.DOUBLE, "writeDoubleLE");
     }
 
     /**
      * Map a {@link PrimitiveType} to a JavaScript type name (for JSDoc annotations).
      *
      * @param primitiveType to map.
+     * @param useUnsafeMode if true, use Number for int64/uint64 (faster but loses precision > 2^53).
+     * @return the JavaScript type name.
+     */
+    public static String typescriptTypeName(final PrimitiveType primitiveType, final boolean useUnsafeMode)
+    {
+        return useUnsafeMode ?
+            PRIMITIVE_TYPE_MAP_UNSAFE.get(primitiveType) :
+            PRIMITIVE_TYPE_MAP.get(primitiveType);
+    }
+
+    /**
+     * Map a {@link PrimitiveType} to a JavaScript type name (for JSDoc annotations).
+     * Uses safe mode (BigInt for 64-bit integers).
+     *
+     * @param primitiveType to map.
      * @return the JavaScript type name.
      */
     public static String typescriptTypeName(final PrimitiveType primitiveType)
     {
-        return PRIMITIVE_TYPE_MAP.get(primitiveType);
+        return typescriptTypeName(primitiveType, false);
     }
 
     /**
@@ -98,11 +155,19 @@ public class NodeJsUtil
      *
      * @param primitiveType to map.
      * @param byteOrder for the encoding.
+     * @param useUnsafeMode if true, use Number for int64/uint64 (faster but loses precision > 2^53).
      * @return the Buffer read method name.
      */
-    public static String bufferReadMethod(final PrimitiveType primitiveType, final String byteOrder)
+    public static String bufferReadMethod(
+        final PrimitiveType primitiveType,
+        final String byteOrder,
+        final boolean useUnsafeMode)
     {
-        String method = BUFFER_READ_METHOD_MAP.get(primitiveType);
+        final Map<PrimitiveType, String> methodMap = useUnsafeMode ?
+            BUFFER_READ_METHOD_MAP_UNSAFE :
+            BUFFER_READ_METHOD_MAP;
+
+        String method = methodMap.get(primitiveType);
         if (method == null)
         {
             throw new IllegalArgumentException("No Buffer read method for primitive type: " + primitiveType);
@@ -130,15 +195,35 @@ public class NodeJsUtil
     }
 
     /**
+     * Get the Buffer read method for a primitive type (safe mode).
+     *
+     * @param primitiveType to map.
+     * @param byteOrder for the encoding.
+     * @return the Buffer read method name.
+     */
+    public static String bufferReadMethod(final PrimitiveType primitiveType, final String byteOrder)
+    {
+        return bufferReadMethod(primitiveType, byteOrder, false);
+    }
+
+    /**
      * Get the Buffer write method for a primitive type.
      *
      * @param primitiveType to map.
      * @param byteOrder for the encoding.
+     * @param useUnsafeMode if true, use Number for int64/uint64 (faster but loses precision > 2^53).
      * @return the Buffer write method name.
      */
-    public static String bufferWriteMethod(final PrimitiveType primitiveType, final String byteOrder)
+    public static String bufferWriteMethod(
+        final PrimitiveType primitiveType,
+        final String byteOrder,
+        final boolean useUnsafeMode)
     {
-        String method = BUFFER_WRITE_METHOD_MAP.get(primitiveType);
+        final Map<PrimitiveType, String> methodMap = useUnsafeMode ?
+            BUFFER_WRITE_METHOD_MAP_UNSAFE :
+            BUFFER_WRITE_METHOD_MAP;
+
+        String method = methodMap.get(primitiveType);
         if (method == null)
         {
             throw new IllegalArgumentException("No Buffer write method for primitive type: " + primitiveType);
@@ -163,6 +248,18 @@ public class NodeJsUtil
         }
 
         return method;
+    }
+
+    /**
+     * Get the Buffer write method for a primitive type (safe mode).
+     *
+     * @param primitiveType to map.
+     * @param byteOrder for the encoding.
+     * @return the Buffer write method name.
+     */
+    public static String bufferWriteMethod(final PrimitiveType primitiveType, final String byteOrder)
+    {
+        return bufferWriteMethod(primitiveType, byteOrder, false);
     }
 
     /**

@@ -151,6 +151,13 @@ public class SbeTool
     public static final String CPP_NAMESPACES_COLLAPSE = "sbe.cpp.namespaces.collapse";
 
     /**
+     * Boolean system property to enable unsafe mode for Node.js code generation.
+     * When true, int64/uint64 use Number instead of BigInt (5x faster but loses precision > 2^53).
+     * Defaults to false (safe mode with BigInt).
+     */
+    public static final String NODEJS_UNSAFE_MODE = "sbe.nodejs.unsafe.mode";
+
+    /**
      * Version of the Rust crate to generate.
      */
     public static final String RUST_CRATE_VERSION = "sbe.rust.crate.version";
