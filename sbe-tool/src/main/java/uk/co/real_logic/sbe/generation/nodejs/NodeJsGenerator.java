@@ -928,8 +928,18 @@ public class NodeJsGenerator implements CodeGenerator
                 // Enum: encode as underlying integer type
                 final PrimitiveType primitiveType = encodingToken.encoding().primitiveType();
                 final String writeMethod = bufferWriteMethod(primitiveType, byteOrderStr, useUnsafeMode);
-                sb.append(INDENT).append(INDENT).append("buffer.").append(writeMethod).append("(this._")
-                    .append(fieldName).append(", pos);\n");
+                final boolean needsBigIntConversion = useUnsafeMode &&
+                    (primitiveType == PrimitiveType.INT64 || primitiveType == PrimitiveType.UINT64);
+                sb.append(INDENT).append(INDENT).append("buffer.").append(writeMethod).append("(");
+                if (needsBigIntConversion)
+                {
+                    sb.append("BigInt(this._").append(fieldName).append(" || 0)");
+                }
+                else
+                {
+                    sb.append("this._").append(fieldName);
+                }
+                sb.append(", pos);\n");
                 sb.append(INDENT).append(INDENT).append("pos += ").append(primitiveTypeSize(primitiveType))
                     .append(";\n");
             }
@@ -938,8 +948,18 @@ public class NodeJsGenerator implements CodeGenerator
                 // Bitset: encode the value property
                 final PrimitiveType primitiveType = encodingToken.encoding().primitiveType();
                 final String writeMethod = bufferWriteMethod(primitiveType, byteOrderStr, useUnsafeMode);
-                sb.append(INDENT).append(INDENT).append("buffer.").append(writeMethod).append("(this._")
-                    .append(fieldName).append(".value, pos);\n");
+                final boolean needsBigIntConversion = useUnsafeMode &&
+                    (primitiveType == PrimitiveType.INT64 || primitiveType == PrimitiveType.UINT64);
+                sb.append(INDENT).append(INDENT).append("buffer.").append(writeMethod).append("(");
+                if (needsBigIntConversion)
+                {
+                    sb.append("BigInt(this._").append(fieldName).append(".value || 0)");
+                }
+                else
+                {
+                    sb.append("this._").append(fieldName).append(".value");
+                }
+                sb.append(", pos);\n");
                 sb.append(INDENT).append(INDENT).append("pos += ").append(primitiveTypeSize(primitiveType))
                     .append(";\n");
             }
@@ -969,12 +989,21 @@ public class NodeJsGenerator implements CodeGenerator
                         // Numeric array: encode each element
                         final String writeMethod = bufferWriteMethod(primitiveType, byteOrderStr, useUnsafeMode);
                         final int elementSize = primitiveTypeSize(primitiveType);
+                        final boolean needsBigIntConversion = useUnsafeMode &&
+                            (primitiveType == PrimitiveType.INT64 || primitiveType == PrimitiveType.UINT64);
                         sb.append(INDENT).append(INDENT).append("// Encode array: ").append(fieldName).append("\n");
                         sb.append(INDENT).append(INDENT).append("for (let i = 0; i < ").append(arrayLength)
                             .append("; i++) {\n");
-                        sb.append(INDENT).append(INDENT).append(INDENT).append("buffer.").append(writeMethod)
-                            .append("(this._").append(fieldName).append("[i], pos + i * ").append(elementSize)
-                            .append(");\n");
+                        sb.append(INDENT).append(INDENT).append(INDENT).append("buffer.").append(writeMethod).append("(");
+                        if (needsBigIntConversion)
+                        {
+                            sb.append("BigInt(this._").append(fieldName).append("[i] || 0)");
+                        }
+                        else
+                        {
+                            sb.append("this._").append(fieldName).append("[i]");
+                        }
+                        sb.append(", pos + i * ").append(elementSize).append(");\n");
                         sb.append(INDENT).append(INDENT).append("}\n");
                         sb.append(INDENT).append(INDENT).append("pos += ").append(arrayLength * elementSize)
                             .append(";\n");
@@ -984,8 +1013,18 @@ public class NodeJsGenerator implements CodeGenerator
                 {
                     // Scalar field
                     final String writeMethod = bufferWriteMethod(primitiveType, byteOrderStr, useUnsafeMode);
-                    sb.append(INDENT).append(INDENT).append("buffer.").append(writeMethod).append("(this._")
-                        .append(fieldName).append(", pos);\n");
+                    final boolean needsBigIntConversion = useUnsafeMode &&
+                        (primitiveType == PrimitiveType.INT64 || primitiveType == PrimitiveType.UINT64);
+                    sb.append(INDENT).append(INDENT).append("buffer.").append(writeMethod).append("(");
+                    if (needsBigIntConversion)
+                    {
+                        sb.append("BigInt(this._").append(fieldName).append(" || 0)");
+                    }
+                    else
+                    {
+                        sb.append("this._").append(fieldName);
+                    }
+                    sb.append(", pos);\n");
                     sb.append(INDENT).append(INDENT).append("pos += ").append(primitiveTypeSize(primitiveType))
                         .append(";\n");
                 }
@@ -1140,8 +1179,19 @@ public class NodeJsGenerator implements CodeGenerator
                 // Enum: decode as underlying integer type
                 final PrimitiveType primitiveType = encodingToken.encoding().primitiveType();
                 final String readMethod = bufferReadMethod(primitiveType, byteOrderStr, useUnsafeMode);
-                sb.append(INDENT).append(INDENT).append("this._").append(fieldName).append(" = buffer.")
-                    .append(readMethod).append("(pos);\n");
+                final boolean needsNumberConversion = useUnsafeMode &&
+                    (primitiveType == PrimitiveType.INT64 || primitiveType == PrimitiveType.UINT64);
+                sb.append(INDENT).append(INDENT).append("this._").append(fieldName).append(" = ");
+                if (needsNumberConversion)
+                {
+                    sb.append("Number(");
+                }
+                sb.append("buffer.").append(readMethod).append("(pos)");
+                if (needsNumberConversion)
+                {
+                    sb.append(")");
+                }
+                sb.append(";\n");
                 sb.append(INDENT).append(INDENT).append("pos += ").append(primitiveTypeSize(primitiveType))
                     .append(";\n");
             }
@@ -1150,8 +1200,19 @@ public class NodeJsGenerator implements CodeGenerator
                 // Bitset: decode into value property
                 final PrimitiveType primitiveType = encodingToken.encoding().primitiveType();
                 final String readMethod = bufferReadMethod(primitiveType, byteOrderStr, useUnsafeMode);
-                sb.append(INDENT).append(INDENT).append("this._").append(fieldName).append(".value = buffer.")
-                    .append(readMethod).append("(pos);\n");
+                final boolean needsNumberConversion = useUnsafeMode &&
+                    (primitiveType == PrimitiveType.INT64 || primitiveType == PrimitiveType.UINT64);
+                sb.append(INDENT).append(INDENT).append("this._").append(fieldName).append(".value = ");
+                if (needsNumberConversion)
+                {
+                    sb.append("Number(");
+                }
+                sb.append("buffer.").append(readMethod).append("(pos)");
+                if (needsNumberConversion)
+                {
+                    sb.append(")");
+                }
+                sb.append(";\n");
                 sb.append(INDENT).append(INDENT).append("pos += ").append(primitiveTypeSize(primitiveType))
                     .append(";\n");
             }
@@ -1186,12 +1247,23 @@ public class NodeJsGenerator implements CodeGenerator
                         // Numeric array: decode each element
                         final String readMethod = bufferReadMethod(primitiveType, byteOrderStr, useUnsafeMode);
                         final int elementSize = primitiveTypeSize(primitiveType);
+                        final boolean needsNumberConversion = useUnsafeMode &&
+                            (primitiveType == PrimitiveType.INT64 || primitiveType == PrimitiveType.UINT64);
                         sb.append(INDENT).append(INDENT).append("// Decode array: ").append(fieldName).append("\n");
                         sb.append(INDENT).append(INDENT).append("for (let i = 0; i < ").append(arrayLength)
                             .append("; i++) {\n");
                         sb.append(INDENT).append(INDENT).append(INDENT).append("this._").append(fieldName)
-                            .append("[i] = buffer.").append(readMethod).append("(pos + i * ").append(elementSize)
-                            .append(");\n");
+                            .append("[i] = ");
+                        if (needsNumberConversion)
+                        {
+                            sb.append("Number(");
+                        }
+                        sb.append("buffer.").append(readMethod).append("(pos + i * ").append(elementSize).append(")");
+                        if (needsNumberConversion)
+                        {
+                            sb.append(")");
+                        }
+                        sb.append(";\n");
                         sb.append(INDENT).append(INDENT).append("}\n");
                         sb.append(INDENT).append(INDENT).append("pos += ").append(arrayLength * elementSize)
                             .append(";\n");
@@ -1201,8 +1273,19 @@ public class NodeJsGenerator implements CodeGenerator
                 {
                     // Scalar field
                     final String readMethod = bufferReadMethod(primitiveType, byteOrderStr, useUnsafeMode);
-                    sb.append(INDENT).append(INDENT).append("this._").append(fieldName).append(" = buffer.")
-                        .append(readMethod).append("(pos);\n");
+                    final boolean needsNumberConversion = useUnsafeMode &&
+                        (primitiveType == PrimitiveType.INT64 || primitiveType == PrimitiveType.UINT64);
+                    sb.append(INDENT).append(INDENT).append("this._").append(fieldName).append(" = ");
+                    if (needsNumberConversion)
+                    {
+                        sb.append("Number(");
+                    }
+                    sb.append("buffer.").append(readMethod).append("(pos)");
+                    if (needsNumberConversion)
+                    {
+                        sb.append(")");
+                    }
+                    sb.append(";\n");
                     sb.append(INDENT).append(INDENT).append("pos += ").append(primitiveTypeSize(primitiveType))
                         .append(";\n");
                 }
@@ -1644,8 +1727,18 @@ public class NodeJsGenerator implements CodeGenerator
             {
                 final PrimitiveType primitiveType = encodingToken.encoding().primitiveType();
                 final String writeMethod = bufferWriteMethod(primitiveType, byteOrderStr, useUnsafeMode);
-                sb.append(INDENT).append(INDENT).append("buffer.").append(writeMethod).append("(this._")
-                    .append(fieldName).append(", pos);\n");
+                final boolean needsBigIntConversion = useUnsafeMode &&
+                    (primitiveType == PrimitiveType.INT64 || primitiveType == PrimitiveType.UINT64);
+                sb.append(INDENT).append(INDENT).append("buffer.").append(writeMethod).append("(");
+                if (needsBigIntConversion)
+                {
+                    sb.append("BigInt(this._").append(fieldName).append(" || 0)");
+                }
+                else
+                {
+                    sb.append("this._").append(fieldName);
+                }
+                sb.append(", pos);\n");
                 sb.append(INDENT).append(INDENT).append("pos += ").append(primitiveTypeSize(primitiveType))
                     .append(";\n");
             }
@@ -1782,8 +1875,19 @@ public class NodeJsGenerator implements CodeGenerator
             {
                 final PrimitiveType primitiveType = encodingToken.encoding().primitiveType();
                 final String readMethod = bufferReadMethod(primitiveType, byteOrderStr, useUnsafeMode);
-                sb.append(INDENT).append(INDENT).append("this._").append(fieldName).append(" = buffer.")
-                    .append(readMethod).append("(pos);\n");
+                final boolean needsNumberConversion = useUnsafeMode &&
+                    (primitiveType == PrimitiveType.INT64 || primitiveType == PrimitiveType.UINT64);
+                sb.append(INDENT).append(INDENT).append("this._").append(fieldName).append(" = ");
+                if (needsNumberConversion)
+                {
+                    sb.append("Number(");
+                }
+                sb.append("buffer.").append(readMethod).append("(pos)");
+                if (needsNumberConversion)
+                {
+                    sb.append(")");
+                }
+                sb.append(";\n");
                 sb.append(INDENT).append(INDENT).append("pos += ").append(primitiveTypeSize(primitiveType))
                     .append(";\n");
             }

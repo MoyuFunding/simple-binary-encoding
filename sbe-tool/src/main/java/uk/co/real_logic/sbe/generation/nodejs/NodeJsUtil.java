@@ -81,16 +81,16 @@ public class NodeJsUtil
         BUFFER_READ_METHOD_MAP.put(PrimitiveType.FLOAT, "readFloatLE");
         BUFFER_READ_METHOD_MAP.put(PrimitiveType.DOUBLE, "readDoubleLE");
 
-        // Unsafe mode: use Number methods (loses precision for > 2^53 but faster)
+        // Unsafe mode: use BigInt methods but wrap with Number() (loses precision for > 2^53 but faster)
         BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.CHAR, "readUInt8");
         BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.INT8, "readInt8");
         BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.INT16, "readInt16LE");
         BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.INT32, "readInt32LE");
-        BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.INT64, "readDoubleLE");
+        BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.INT64, "readBigInt64LE");
         BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT8, "readUInt8");
         BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT16, "readUInt16LE");
         BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT32, "readUInt32LE");
-        BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT64, "readDoubleLE");
+        BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT64, "readBigUInt64LE");
         BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.FLOAT, "readFloatLE");
         BUFFER_READ_METHOD_MAP_UNSAFE.put(PrimitiveType.DOUBLE, "readDoubleLE");
     }
@@ -110,16 +110,16 @@ public class NodeJsUtil
         BUFFER_WRITE_METHOD_MAP.put(PrimitiveType.FLOAT, "writeFloatLE");
         BUFFER_WRITE_METHOD_MAP.put(PrimitiveType.DOUBLE, "writeDoubleLE");
 
-        // Unsafe mode: use Number methods (loses precision for > 2^53 but faster)
+        // Unsafe mode: use BigInt methods but wrap with BigInt() (loses precision for > 2^53 but faster)
         BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.CHAR, "writeUInt8");
         BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.INT8, "writeInt8");
         BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.INT16, "writeInt16LE");
         BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.INT32, "writeInt32LE");
-        BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.INT64, "writeDoubleLE");
+        BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.INT64, "writeBigInt64LE");
         BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT8, "writeUInt8");
         BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT16, "writeUInt16LE");
         BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT32, "writeUInt32LE");
-        BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT64, "writeDoubleLE");
+        BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.UINT64, "writeBigUInt64LE");
         BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.FLOAT, "writeFloatLE");
         BUFFER_WRITE_METHOD_MAP_UNSAFE.put(PrimitiveType.DOUBLE, "writeDoubleLE");
     }
